@@ -20,12 +20,12 @@
 using namespace std;
 int main(int a, char* b[10])
 {
-	string fin,fout,main_string;	
+	string fin,fout,main_string;
 	unsigned char options;
 	char stop,type;
 	type=1;	// [0-2] Читать все залпом, по словам, по строкам (сразу после прочтения куска - выполнение mainwork).
 	stop=0;	// [0-1] Работать со всеми данными, только с первым элементом (см. type).
-	
+
 	if (a>20){cout<<"Слишком много аргументов!\n"; return 1;} // Защита от дураков по кол-ву аргументов
 	if (arguments(a,b,fin,fout,options)) return 1; // Обрабатываем аргументы, если что - выходим
 	if (options&1) debug(a,b,options,fin,fout); // Отладка
