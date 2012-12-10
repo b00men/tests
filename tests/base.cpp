@@ -144,17 +144,19 @@ bool findhelp(int a, char* c[10], string help)
 
 int mainwork (struct arguments& arg){
 	cout<<"Mainwork Start!\n";
-	string command = arg.target + ' ' + arg.main_string;
+	//string command = arg.target + ' ' + arg.main_string;
 	//system(command.c_str());
 	//if (system(NULL)) cout<<"YES!\n";
 	//exit (EXIT_FAILURE);
-	/*
+/*
 	cout<<"NULL: "<<system(NULL)<<"123\n";
 	cout<<"Target: "<<system(command.c_str())<<"123\n";
 	cout<<"cat: "<<system(" cat ")<<"123\n";
-	*/
-	//execv("./Program", NULL);
-	
+*/
+	execv(arg.target.c_str(), 0);
+	std::cout << "! = " << std::endl;
+	exit( 1 );
+/*
 	char output[100];
 	FILE *p = popen("cat 2>&1", "r");
 
@@ -163,7 +165,7 @@ int mainwork (struct arguments& arg){
 	fgets(output, sizeof(output), p);
 	cout<<output;
 	cout<<"fget iter complite!\n";
-
+*/
 	cout<<"Mainwork complite!\n";
 
 	return 0;
