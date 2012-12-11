@@ -5,7 +5,7 @@
 // #include <stdio.h>
 // #include <conio.h> // For not GNU compiler
 // #include <cmath>
-#include "base.h"
+#include "wrap.h"
 
 // -----Свойства шаблона-----
 // Главная программа в отдельной финкции mainwork.
@@ -22,9 +22,10 @@
 using namespace std;
 int main(int a, char* b[10])
 {
-	arg.type=1;	// [0-2] Читать все залпом, по строкам, по словам (сразу после прочтения куска - выполнение mainwork).
+	//arg.type=2;	// [0-2] Читать все залпом, по строкам, по словам (сразу после прочтения куска - выполнение mainwork).
 	if (a>20){cout<<"Слишком много аргументов!\n"; return 1;} // Защита от дураков по кол-ву аргументов
 	if (arguments(a,b,arg)) return 1; // Обрабатываем аргументы, если что - выходим
+	arg.type=(((arg.options>>1)&1)?(0):(((arg.options>>2)&1)?(2):(1))); // Однозначное ввзятие режима работы
 	if (arg.options&1) debug(a,b,arg); // Отладка
 	if (arg.target.empty()) {cout<<"Целевой файл не выбран. Попробуйте «"<<b[0]<<" --help» для справки.\n"; return 1;}
 	return iomodule(arg); // Основная функция ввода-вывода.
@@ -35,12 +36,13 @@ int arguments(int a, char* c[10], struct arguments& arg)
 	string somestring=c[0];
 	int size;
 	string help="Использование: «"+somestring+" [ключ] ... [файл] ... »\n"+
-				"Оболочка тестирования приложений.\n\n"+
+				"Оболочка тестирования приложений. По умолчанию работает по строкам.\n\n"+
 				"  -h,	--help	Показать эту справку и выйти\n"+
 				"  -o [файл]	Записать результат в [файл]\n"+
 				"  -i [файл]	Читать данные из [файл]\n"+
 				"  -t [файл]	Провести тест над [файл]\n"+
-				"  -k		Тестовый параметр\n"+
+				"  -a		Работать залпом (имеет больший приоритет чем 'w')\n"+
+				"  -w		Работать по словам\n"+
 				"  -d		Режим отладки\n";
 	arg.options=0;
 	
@@ -61,7 +63,8 @@ int arguments(int a, char* c[10], struct arguments& arg)
 				case ('i'): arg.fin=c[i+1]; break;
 				case ('t'): arg.target=c[i+1]; break;
 				case ('d'): arg.options=arg.options|(1<<0); break;
-				case ('k'): arg.options=arg.options|(1<<1); break;
+				case ('a'): arg.options=arg.options|(1<<1); break;
+				case ('w'): arg.options=arg.options|(1<<2); break;
 				default: cout<<c[0]<<": Неизвестный ключ  -- «"<<c[i][j]<<"»\n"<<
 									 "Попробуйте \'"<<c[0]<<" --help\' для получения более подробного описания.\n";
 				return 1; break;		
@@ -78,8 +81,10 @@ int debug(int a, char* b[10], struct arguments& arg)
 	string somestring;
 	cout<<"Количество блоков аргументов: "<<(a-1)<<"\nЭто: \n"; // Аргументы
 	for (int i=1;i<a;somestring=b[i],cout<<somestring<<'\n',i++);
-	cout<<"\nOptions\ndk------\n"<<vec2string(arg.options)<<"\nВходной файл: "<<arg.fin<<
-		  "\nВыходной файл: "<<arg.fout<<"\nЦелевой файл: "<<arg.target<<"\n\n"; // Debug опции, входной и выходной файлы
+	cout<<"\nOptions\ndaw-----\n"<<vec2string(arg.options)<<"\nВходной файл: "<<arg.fin<<
+		  "\nВыходной файл: "<<arg.fout<<"\nЦелевой файл: "<<arg.target<<"\nРежим работы: "<<
+		  ((arg.type==0)?("Залпом"):((arg.type==2)?("По словам"):((arg.type==1)?("По строкам"):("ВНИМАНИЕ! Не допустимое значение!"))))
+		  <<"\n\n"; // Debug опции, входной и выходной файлы
 	cout<<"Вывести переменные среды [Y/n]? ";
 	char debugquest;
 	scanf("%c",&debugquest);
@@ -106,7 +111,7 @@ int iomodule(struct arguments& arg)
 		}
 		if ((c==EOF)&&(arg.main_string.empty())) break;		// Неожиданный конец. Например сразу или в начале строки.
 		if (mainwork(arg)) return 2;	// Здесь наша программа выполняет свои главные функции.
-		//(arg.fout.empty())?(cout<<arg.main_string):(out<<arg.main_string);	// Вывод результатов.
+		(arg.fout.empty())?(cout<<arg.main_string):(out<<arg.main_string);	// Вывод результатов.
 		if (arg.type!=0) (arg.fout.empty())?(cout<<'\n'):(out<<'\n');	// Вывод дополнительных '\n' при режимах "строка" или "слово"
 		if (c==EOF) break;
 	}
@@ -142,31 +147,33 @@ bool findhelp(int a, char* c[10], string help)
 	return false;
 }
 
-int mainwork (struct arguments& arg){
-	cout<<"Mainwork Start!\n";
-	//string command = arg.target + ' ' + arg.main_string;
-	//system(command.c_str());
-	//if (system(NULL)) cout<<"YES!\n";
-	//exit (EXIT_FAILURE);
-/*
-	cout<<"NULL: "<<system(NULL)<<"123\n";
-	cout<<"Target: "<<system(command.c_str())<<"123\n";
-	cout<<"cat: "<<system(" cat ")<<"123\n";
-*/
-	execv(arg.target.c_str(), 0);
-	std::cout << "! = " << std::endl;
-	exit( 1 );
-/*
-	char output[100];
-	FILE *p = popen("cat 2>&1", "r");
-
-	if (fputs(arg.main_string.c_str(), p)) cout<<"Ok!\n";
-	else cout<<"NOOOOoooooo!\n";
-	fgets(output, sizeof(output), p);
-	cout<<output;
-	cout<<"fget iter complite!\n";
-*/
-	cout<<"Mainwork complite!\n";
+int mainwork (struct arguments& arg)
+{
+	int p1[2], p2[2]; //pipe: p1 - stdin > programm, p2 - stdout < programm
+	FILE *f1, *f2;
+	int i;
+	char line[80];
+	pipe(p1);
+	pipe(p2);
+	f1 = fdopen(p1[1], "w"); // связывает поток с описателем файла
+	f2 = fdopen(p2[0], "r");
+	if (fork() == 0) { // i'm child?
+		dup2(p1[0], 0); // stdin // Создаем копию файлового дескриптора, закрывая перед этим номер нового если необходимо
+		dup2(p2[1], 1); // stdout
+		close(p1[1]); // просто закрываем файловый дескриптор
+		close(p2[0]);
+		execlp(arg.target.c_str(), arg.target.c_str(), NULL); // Замена текущего обрпзп процесса новым, где первым аргументом идет название имполняемого файла, а последний аргумент NULL
+	}
+	else {
+		close(p1[0]);
+		close(p2[1]);
+	}
+	fprintf(f1, "%s", arg.main_string.c_str());
+	fclose(f1);
+	arg.main_string.clear();
+	while (fgets(line, sizeof(line), f2) != NULL) {
+		arg.main_string+=line;	// Запоминание результатов.
+	}
 
 	return 0;
 }
