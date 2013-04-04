@@ -1,7 +1,9 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
-#include <cstdlib>
+#include <unistd.h>
+// #include <sys/types.h>
+// #include <cstdlib>
 // #include <stdio.h>
 // #include <conio.h> // For not GNU compiler
 // #include <cmath>
