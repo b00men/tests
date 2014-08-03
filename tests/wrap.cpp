@@ -154,7 +154,7 @@ int mainwork (struct arguments& arg)
 	int p1[2], p2[2]; //pipe: p1 - stdin > programm, p2 - stdout < programm
 	FILE *f1, *f2;
 	int i;
-	char line[80];
+	char line[80]; // Оптимальнее выделять память снаружи
 	pipe(p1);
 	pipe(p2);
 	f1 = fdopen(p1[1], "w"); // связывает поток с описателем файла
