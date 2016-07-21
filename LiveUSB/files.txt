@@ -1,0 +1,14 @@
+/media/Grub2/boot/debian/
+
+/media/Grub2/boot/iso:
+drweb.iso
+grub2.iso
+memtest86.iso
+Paragon10.iso
+Paragon11.iso
+pmagic.iso
+ubuntu.iso
+xpud.iso
+
+/media/Grub2/boot/grub:
+grub.cfg

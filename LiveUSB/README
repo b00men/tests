@@ -1,0 +1,22 @@
+Данные о флешке на последний момент
+Модель: Kingston DataTraveler 102
+Размер: 14.64 ГиБ
+Таблица разделов: msdos
+
+Раздел      Система     Размер      Флаги   Лейбл       UIDD
+/dev/sdb1   ntfs        9.63 ГиБ            Heap        49118A132549A24F
+/dev/sdb2   ext4        2.00 ГиБ    boot    Grub2       aee6cb5e-8ded-43e4-bc25-f0e31ef165fd
+/dev/sdb3   extended    3.00 ГиБ
+/dev/sdb5   ntfs        3.00 ГиБ    hidden  Windows7    5FEC0DE165DC20CA
+
+Очень важно что sdb1 - Heap, т.к. винде пофиг на флаг hidden и он монтирует именно только первый раздел.
+Размер задавался строо только для Windows7 и Grub2.
+Нужное кол-во ГиБ = кол-во*1024+2 МиБ.
+
+Установка груб проходит следующим образом:
+$ sudo mount /dev/sdb2 /mnt
+$ sudo grub-install --no-floppy --root-directory=/mnt /dev/sdb
+$ sudo chmod 777 -R /mnt/boot/
+$ sudo umount /mnt/
+
+Необходимые файлы можно посмотреть в files.txt
